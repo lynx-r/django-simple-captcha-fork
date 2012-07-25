@@ -1,16 +1,8 @@
-from captcha.conf import settings
-from captcha.helpers import generate_captcha_store
-from captcha.models import CaptchaStore
-from cStringIO import StringIO
-from django.core.urlresolvers import reverse
-from django.http import HttpResponse, Http404, HttpResponseNotFound
-from django.shortcuts import get_object_or_404
-from django.views.decorators.csrf import csrf_protect
 import os
 import random
-from publicdiscussion.utils import HttpJSONResponse
 import re
 import tempfile
+from cStringIO import StringIO
 
 try:
     import Image
@@ -19,6 +11,15 @@ try:
 except ImportError:
     from PIL import Image, ImageDraw, ImageFont
 
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, Http404
+from django.shortcuts import get_object_or_404
+from django.utils import simplejson
+from django.views.decorators.csrf import csrf_protect
+
+from captcha.conf import settings
+from captcha.helpers import generate_captcha_store
+from captcha.models import CaptchaStore
 
 NON_DIGITS_RX = re.compile('[^\d]')
 
@@ -108,16 +109,19 @@ def captcha_audio(request, key):
 
 @csrf_protect
 def captcha_reload_ajax(request):
-
-    if request.POST:
+    if request.META['REQUEST_METHOD'] == 'POST':
         store = generate_captcha_store()
-
-        return HttpJSONResponse(
-            json={
-                'key': store.hashkey,
-                'image_url': reverse('captcha-image', kwargs=dict(key=store.hashkey)),
-            },
-            status=200
+        json = {
+            'key': store.hashkey,
+            'image_url': reverse(
+                'captcha-image',
+                kwargs=dict(key=store.hashkey)
+            )
+        }
+        return HttpResponse(
+            simplejson.dumps(json),
+            mimetype='application/json'
         )
     else:
-        return HttpResponseNotFound()
+        raise Http404
+
