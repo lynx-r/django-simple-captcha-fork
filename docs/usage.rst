@@ -68,9 +68,9 @@ Templates usage
 
 Example with a refresh button :
 
-.. image:: refresh.png
+.. image:: https://github.com/mothsART/django-simple-captcha/raw/master/docs/refresh.png
 
-In your template.html file :
+In your template.html file ::
 
     <html>
         <head>
