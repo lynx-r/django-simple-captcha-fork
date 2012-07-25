@@ -1,5 +1,29 @@
-# virtualenv's files
+# python compiled source and temporary files #
+##############################################
 
+*.pyo
+*.pyc
+*~
+
+# gettext compiled file #
+#########################
+
+*.mo
+
+# database #
+############
+
+*.db
+
+# HG, SVN #
+###########
+
+.svn
+.hg
+.hgignore
+
+# virtualenv's files #
+######################
 /bin/
 /lib/
 /build/
@@ -8,23 +32,22 @@
 /include/
 /.Python
 
-# IDE's 
+# IDE's #
+#########
+
 /.idea/
 /.settings/
 .project
 .pydevproject
 
-# Compiled files
-*.pyo
-*.pyc
-
-
-# Local/development files
+# Local/development files #
+###########################
 /data/*
 !/data/empty
 
 
-# Collected static and media
+# Collected static and media #
+##############################
 /site/static/*
 !/site/static/empty
 
@@ -34,6 +57,7 @@
 /site/documents/*
 !/site/documents/empty
 
+# Documentation output #
+########################
 
-# Documentation output
 /docs/_build
