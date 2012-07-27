@@ -14,8 +14,15 @@ except ImportError:
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
-from django.utils import simplejson
+
+try:
+    # Python >= 2.6
+    import json
+except ImportError:
+    from django.utils import simplejson as json
+
 from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_POST
 
 from captcha.conf import settings
 from captcha.helpers import generate_captcha_store
@@ -82,9 +89,7 @@ def captcha_image(request, key):
     response = HttpResponse()
     response['Content-Type'] = 'image/png'
     response.write(out.read())
-
     return response
-
 
 def captcha_audio(request, key):
     if settings.CAPTCHA_FLITE_PATH:
@@ -108,20 +113,19 @@ def captcha_audio(request, key):
     raise Http404
 
 @csrf_protect
+@require_POST
 def captcha_reload_ajax(request):
-    if request.META['REQUEST_METHOD'] == 'POST':
-        store = generate_captcha_store()
-        json = {
-            'key': store.hashkey,
-            'image_url': reverse(
-                'captcha-image',
-                kwargs=dict(key=store.hashkey)
-            )
-        }
-        return HttpResponse(
-            simplejson.dumps(json),
-            mimetype='application/json'
+    store = generate_captcha_store()
+    data = {
+        'key': store.hashkey,
+        'image_url': reverse(
+            'captcha-image',
+            kwargs=dict(key=store.hashkey)
         )
-    else:
-        raise Http404
+    }
+    return HttpResponse(
+        json.dumps(data),
+        mimetype='application/json'
+    )
+
 
